@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>我的测试页面</title>
+    <link href="styles/style.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=New+Tegomin&display=swap" rel="stylesheet">
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+  </head>
+  <body>
+    <svg width="960" height="500" id="msinsvg" class="svgs"></svg>
+    <img src="images\OIP (1).jpeg" alt="我的测试页面">
+    <h1>The standard of justice is based on equal force</h1>
+    <p> 侑子小姐美艳动人</p>
+    <p> 科林斯</p>
+    <ul>
+        <li>暂缓与亚哥斯结盟</li>
+        <li>不加入四国同盟</li>
+        <li>增进与斯巴达的关系</li>
+        <li>在斯巴达和亚哥斯之间摇摆</li>
+    </ul>
+    <a href="https://tigerruanyifan.github.io/">ryf的网站</a>
+    <script>
+      let mainsvg=d3.select('.svgs');
+
+      let maingroup=mainsvg
+      .append('g')
+      .attr('transform', 'translate(100,100)');
+
+      let circle = maingroup
+      .append('circle')
+      .attr('stroke','black')
+      .attr('r','66')
+      .attr('fill','yellow');
+    </script>
+  </body>
+</html> 
