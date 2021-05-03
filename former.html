@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>monthlyHeat</title>
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+    <script src="https://d3js.org/d3-color"></script>
+    <script src="https://d3js.org/d3-time-format"></script>
+
+</head>
+
+<body>
+    <csv src="data\temperature_daily.csv">
+        <svg width="1600" height="800" id="mainsvg" class="svgs"></svg>
+        <script>
+            //     const data = [{year:1997,month:1,max:20,min:16},{year:1997,month:2,max:25,min:16}
+            //     ,{year:1997,month:3,max:25,min:16},{year:1998,month:1,max:25,min:16},{year:1998,month:2,max:25,min:16}
+            //   ,{year:1998,month:3,max:25,min:16},{year:1999,month:1,max:15,min:16},{year:1999,month:2,max:25,min:16},
+            //   {year:1999,month:3,max:25,min:16}]
+
+            var parseTime = d3.timeParse("%Y-%m-%d");
+            var formatYear = d3.timeFormat("%Y");
+            var formatMonth = d3.timeFormat("%B");
+            var formatDay = d3.timeFormat("%d");
+
+            const svg = d3.select('#mainsvg');
+            const width = +svg.attr('width');
+            const height = +svg.attr('height');
+            const margin = { top: 60, right: 30, bottom: 60, left: 150 };
+            const innerWidth = width - margin.left - margin.right;
+            const innerHeight = height - margin.top - margin.bottom;
+
+            const g = svg.append('g').attr('id', 'maingroup')
+                .attr('transform', `translate(${margin.left}, ${margin.top})`);
+
+            const renderinit = function (data) {
+                const xScale = d3.scaleBand().
+                    domain(data.map(datum => datum.year)).
+                    range([0, innerWidth])
+                    .padding(0.1);
+
+                const yScale = d3.scaleBand().
+                    domain(data.map(datum => datum.month)).
+                    range([0, innerHeight])
+                    .padding(0.1);
+
+                const zScale = d3.scaleLinear()
+                    .domain([d3.min(data, datum => datum.max), d3.max(data, datum => datum.max)])
+                    .range([100, 0]);
+
+                data.forEach(datum => {
+                    g.append('rect')
+                        .attr('width', xScale.bandwidth())
+                        .attr('x', xScale(datum.year))
+                        .attr('height', yScale.bandwidth())
+                        .attr('y', yScale(datum.month))
+                        .attr('fill', d3.hsl(zScale(datum.max), 1.0, 0.5))
+                        .attr('opacity', '0.8')
+                })
+
+                //the following four lines of code is the simplest pattern of adding axis; 
+                const yAxis = d3.axisLeft(yScale);
+                const xAxis = d3.axisTop(xScale);
+                g.append('g').call(yAxis);
+                g.append('g').call(xAxis);
+
+                const yAxisGroup = g.append('g').call(yAxis)
+                    .attr('id', 'yaxis')
+                    .append('text')
+                    .text('Month')
+                    .attr('font-size', '3em')
+                    .attr('transform', 'rotate(-90)') // y-axis label needs an additional transform; 
+                    .attr('x', -innerHeight / 2)
+                    .attr('y', -120)
+                    .attr('fill', 'black')
+                const xAxisGroup = g.append('g').call(xAxis)
+                    .attr('id', 'xaxis')
+                    .append('text')
+                    .text('Year')
+                    .attr('font-size', '3em')
+                    .attr('x', innerWidth / 2)
+                    .attr('y', 50)
+                    .attr('fill', 'black');
+            }
+
+            d3.csv('data/temperature_daily.csv').then(data => {
+                data.forEach(d => {
+                    d['year'] = formatYear(parseTime(d['date']));
+                    d['month'] = formatMonth(parseTime(d['date']));
+                    d['day'] = formatDay(parseTime(d['date']));
+                    d['max'] = + d['max_temperature'];
+                });
+                renderinit(data);
+            })
+
+
+
+        </script>
+</body>
+
+</html>
