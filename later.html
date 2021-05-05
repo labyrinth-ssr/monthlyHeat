@@ -13,6 +13,7 @@
     <csv src="data\temperature_daily.csv">
         <svg width="1600" height="800" id="mainsvg" class="svgs"></svg>
         <script>
+           
             var parseTime = d3.timeParse("%Y-%m-%d");
             var formatYear = d3.timeFormat("%Y");
             var formatMonth = d3.timeFormat("%B");
@@ -28,6 +29,7 @@
 
             const g = svg.append('g').attr('id', 'maingroup')
                 .attr('transform', `translate(${margin.left}, ${margin.top})`);
+            
 
             const renderinit = function (data) {
                 const xScale = d3.scaleBand().
@@ -44,11 +46,10 @@
                     .domain([d3.min(data, datum => +datum.max_temperature), d3.max(data, datum => +datum.max_temperature)])
                     .range([200, 0]);
 
-                for (let i = d3.min(data, datum => +datum.year); i <= d3.max(data, datum => +datum.year); i++) {
+                for (let i = 2008; i <= d3.max(data, datum => +datum.year); i++) {
                     for (let j = d3.min(data, datum => +datum.monthNum); j <= d3.max(data, datum => datum.monthNum); j++) {
                         var groupData = data.filter(datum => (+datum.year === i && +datum.monthNum === j));
                         if (groupData.length !== 0) {
-                            console.log(groupData[0].year);
                             g.append('rect')
                                 .attr('width', xScale.bandwidth())
                                 .attr('x', xScale(groupData[0].year))
@@ -56,6 +57,54 @@
                                 .attr('y', yScale(groupData[0].month))
                                 .attr('fill', d3.hsl(zScale(d3.max(groupData, datum => +datum.max_temperature)), 1.0, 0.5))
                                 .attr('opacity', '0.8')
+
+                                var g0 = g.append('g')
+                .attr('transform', `translate(${xScale(groupData[0].year)}, ${yScale(groupData[0].month)})`);
+
+                            const subXScale = d3.scaleTime()
+                                .domain([d3.min(groupData, d => parseTime(d.date)), d3.max(groupData, d => parseTime(d.date))])
+                                .range([0, xScale.bandwidth()]);
+                            
+                            
+
+                            const subYScale = d3.scaleLinear()
+                                .domain([d3.max(data, datum => +datum.min_temperature), d3.min(data, datum => +datum.max_temperature)])
+                                .range([0.1*yScale.bandwidth(), 0.9*yScale.bandwidth()])
+                                
+
+                            var line1 = d3.line()
+                            .x(function(d) {
+                    return subXScale(parseTime(d.date));
+                })
+                .y(function(d) {
+                    return subYScale(d.max_temperature);
+                });
+
+                var line2 = d3.line()
+                            .x(function(d) {
+                    return subXScale(parseTime(d.date));
+                })
+                .y(function(d) {
+                    return subYScale(d.min_temperature);
+                });
+                            
+                            g0.append("path")
+                                .datum(groupData)
+                                .attr("fill", "none")
+                                .attr("stroke", "steelblue")
+                                .attr("stroke-width", 1.5)
+                                .attr("stroke-linejoin", "round")
+                                .attr("stroke-linecap", "round")
+                                .attr("d", line1);
+
+                            g0.append("path")
+                                .datum(groupData)
+                                .attr("fill", "none")
+                                .attr("stroke", "green")
+                                .attr("stroke-width", 1.5)
+                                .attr("stroke-linejoin", "round")
+                                .attr("stroke-linecap", "round")
+                                .attr("d", line2);
 
                         }
                     }
@@ -95,6 +144,7 @@
                 });
                 renderinit(data);
             })
+        
         </script>
 </body>
 
