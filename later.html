@@ -13,16 +13,11 @@
     <csv src="data\temperature_daily.csv">
         <svg width="1600" height="800" id="mainsvg" class="svgs"></svg>
         <script>
-            //     const data = [{year:1997,month:1,max:20,min:16},{year:1997,month:2,max:25,min:16}
-            //     ,{year:1997,month:3,max:25,min:16},{year:1998,month:1,max:25,min:16},{year:1998,month:2,max:25,min:16}
-            //   ,{year:1998,month:3,max:25,min:16},{year:1999,month:1,max:15,min:16},{year:1999,month:2,max:25,min:16},
-            //   {year:1999,month:3,max:25,min:16}]
-
             var parseTime = d3.timeParse("%Y-%m-%d");
             var formatYear = d3.timeFormat("%Y");
             var formatMonth = d3.timeFormat("%B");
             var formatDay = d3.timeFormat("%d");
-            var formatMonthNum=d3.timeFormat("%m");
+            var formatMonthNum = d3.timeFormat("%m");
 
             const svg = d3.select('#mainsvg');
             const width = +svg.attr('width');
@@ -46,25 +41,25 @@
                     .padding(0.1);
 
                 const zScale = d3.scaleLinear()
-                    .domain([d3.min(data, datum => datum.max), d3.max(data, datum => datum.max)])
+                    .domain([d3.min(data, datum => +datum.max_temperature), d3.max(data, datum => +datum.max_temperature)])
                     .range([200, 0]);
 
-                
-                for(let i=d3.min(data,datum=>+datum.year);i<d3.max(data,datum=>+datum.year);i++){
-                for (let j=d3.min(data,datum=>+datum.monthNum);j<d3.max(data,datum=>datum.monthNum);j++){
-                    var groupData=data.filter(datum=>(+datum.year===i&&+datum.monthNum===j));
-                    console.log(groupData[0].year);
-                    g.append('rect')
-                        .attr('width', xScale.bandwidth())
-                        .attr('x', xScale(groupData[0].year))
-                        .attr('height', yScale.bandwidth())
-                        .attr('y', yScale(groupData[0].month))
-                        .attr('fill', d3.hsl(zScale(d3.max(groupData,datum=>datum.max)), 1.0, 0.5))
-                        .attr('opacity', '0.8')
-                    
-                    
+                for (let i = d3.min(data, datum => +datum.year); i <= d3.max(data, datum => +datum.year); i++) {
+                    for (let j = d3.min(data, datum => +datum.monthNum); j <= d3.max(data, datum => datum.monthNum); j++) {
+                        var groupData = data.filter(datum => (+datum.year === i && +datum.monthNum === j));
+                        if (groupData.length !== 0) {
+                            console.log(groupData[0].year);
+                            g.append('rect')
+                                .attr('width', xScale.bandwidth())
+                                .attr('x', xScale(groupData[0].year))
+                                .attr('height', yScale.bandwidth())
+                                .attr('y', yScale(groupData[0].month))
+                                .attr('fill', d3.hsl(zScale(d3.max(groupData, datum => +datum.max_temperature)), 1.0, 0.5))
+                                .attr('opacity', '0.8')
+
+                        }
+                    }
                 }
-            }
 
                 //the following four lines of code is the simplest pattern of adding axis; 
                 const yAxis = d3.axisLeft(yScale);
@@ -95,16 +90,11 @@
                 data.forEach(d => {
                     d['year'] = formatYear(parseTime(d['date']));
                     d['month'] = formatMonth(parseTime(d['date']));
-                    d['monthNum']=formatMonthNum(parseTime(d['date']));
+                    d['monthNum'] = formatMonthNum(parseTime(d['date']));
                     d['day'] = formatDay(parseTime(d['date']));
-                    d['max'] = + d['max_temperature'];
                 });
                 renderinit(data);
-
             })
-
-
-
         </script>
 </body>
 
