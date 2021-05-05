@@ -11,7 +11,7 @@
 
 <body>
     <csv src="data\temperature_daily.csv">
-        <svg width="1600" height="800" id="mainsvg" class="svgs"></svg>
+        <svg width="1000" height="800" id="mainsvg" class="svgs"></svg>
         <script>
            
             var parseTime = d3.timeParse("%Y-%m-%d");
@@ -68,8 +68,8 @@
                             
 
                             const subYScale = d3.scaleLinear()
-                                .domain([d3.max(data, datum => +datum.min_temperature), d3.min(data, datum => +datum.max_temperature)])
-                                .range([0.1*yScale.bandwidth(), 0.9*yScale.bandwidth()])
+                                .domain([d3.max(data, datum => +datum.max_temperature), d3.min(data, datum => +datum.min_temperature)])
+                                .range([0, yScale.bandwidth()])
                                 
 
                             var line1 = d3.line()
@@ -142,6 +142,7 @@
                     d['monthNum'] = formatMonthNum(parseTime(d['date']));
                     d['day'] = formatDay(parseTime(d['date']));
                 });
+                data=data.filter(datum => (+datum.year >= 2008));
                 renderinit(data);
             })
         
