@@ -35,8 +35,6 @@
             const g2 = svg.append('g').attr('id', 'colourScale')
                 .attr('transform', `translate(${innerWidth + margin.left}, ${margin.top})`)
 
-
-
             for (let i = 0; i <= 7; i++) {
                 g2.append('rect')
                     .attr('width', '30')
@@ -51,7 +49,6 @@
                     .attr('y', `${i * 20}`)
                     .attr('font-size', '12px')
                     .attr('fill', 'black')
-
             }
 
             const renderinit = function (data) {
@@ -73,12 +70,12 @@
                     for (let j = d3.min(data, datum => +datum.monthNum); j <= d3.max(data, datum => datum.monthNum); j++) {
                         var groupData = data.filter(datum => (+datum.year === i && +datum.monthNum === j));
                         // console.log(groupData);
-                        var monthMax = d3.max(groupData, datum => +datum.max_temperature);
                         if (groupData.length !== 0) {
                             var monthData = [{ monthDate: groupData[0].yearMonth, month: groupData[0].month, max: d3.max(groupData, datum => +datum.max_temperature), year: groupData[0].year }]
 
                                 g
                                 .append('rect')
+                                .attr('class','maxGroup')
                                 .data(monthData)
                                 .attr('id', `rect${(j - 1) * 10 + (i - 2007)}`)
                                 .attr('x', d => xScale(d.year))
@@ -87,6 +84,18 @@
                                 .attr('height', yScale.bandwidth())
                                 .attr('fill', d3.hsl(zScale(d3.max(groupData, datum => +datum.max_temperature)), 0.9, 0.5))
                                 .attr('opacity', '0.8')
+
+                                g
+                                .append('rect')
+                                .attr('class','minGroup')
+                                .data(monthData)
+                                .attr('id', `rect${(j - 1) * 10 + (i - 2007)+200}`)
+                                .attr('x', d => xScale(d.year))
+                                .attr('y', d => yScale(d.month))
+                                .attr('width', xScale.bandwidth())
+                                .attr('height', yScale.bandwidth())
+                                .attr('fill', d3.hsl(zScale(d3.max(groupData, datum => +datum.min_temperature)), 0.9, 0.5))
+                                .attr('opacity', '0')
 
                             var g0 = g.append('g').attr('id', `gName${(j - 1) * 10 + (i - 2007)}`).data(monthData)
                                 .attr('transform', `translate(${xScale(groupData[0].year)}, ${yScale(groupData[0].month)})`);
@@ -114,8 +123,6 @@
                                 .y(function (d) {
                                     return subYScale(d.min_temperature);
                                 });
-
-                            let monthlyMax = 0;
 
                             g0.append("path")
                                 .datum(groupData)
@@ -185,6 +192,15 @@
                 });
                 data = data.filter(datum => (+datum.year >= 2008));
                 renderinit(data);
+            })
+
+            d3.select('#maingroup')
+            .on('click',function(d,i){
+                
+                
+                d3.selectAll('.minGroup').attr('opacity','0.8');
+                d3.selectAll('.maxGroup').attr('opacity','0');
+
             })
 
         </script>
